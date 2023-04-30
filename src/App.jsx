@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import MessageList from "./components/MessageList";
 
 export default function App() {
 	const [formValues, setFormValues] = useState({ email: "", message: "" });
@@ -9,7 +10,7 @@ export default function App() {
 	const [errorMessage, setErrorMessage] = useState('')
 	const [successMessage, setSuccessMessage] = useState('')
 	const [formError, setFormError] = useState(false)
-	const [editValues, setEditValues] = useState({ id: "", email: "", message: "" })
+	const [editValues, setEditValues] = useState({ email: "", message: "" })
 	const [selectedEdit, SetSelectedEdit] = useState(null)
 
 	async function handleSubmit(event) {
@@ -55,7 +56,7 @@ export default function App() {
 
 
 	async function saveEditChanges() {
-		try {
+	try {
 			const response = await axios.put(
 				`http://localhost:3000/messages/${selectedEdit.id}`,
 				editValues
@@ -63,7 +64,7 @@ export default function App() {
 
 			if (response.data.code === 1) {
 				setSuccess(response.data.message);
-				setSelectedMessage(null);
+				SetSelectedEdit(null);
 				setEditValues({ email: "", message: "" });
 			} else if (response.data.code === 3) {
 				setError(response.data.message);
@@ -77,15 +78,17 @@ export default function App() {
 
 	async function deleteMessage(id) {
 		try {
-			const response = await axios.delete(
-				`http://localhost:3000/messages/${id}`
-			);
+			if (confirm("Do you want to delete this ?")) {
+				const response = await axios.delete(
+					`http://localhost:3000/messages/${id}`
+				);
 
-			if (response.data.code === 1) {
-				setSuccess(response.data.message);
-				fetchMessages();
-			} else if (response.data.code === 3) {
-				setError(response.data.message);
+				if (response.data.code === 1) {
+					setSuccessMessage(response.data.message);
+					return setSuccess(true)
+				} else if (response.data.code === 3) {
+					setError(response.data.message);
+				}
 			}
 		} catch (error) {
 			console.error(error);
@@ -105,9 +108,10 @@ export default function App() {
 	}
 
 
-	async function handleEdit(message) {
-		SetSelectedEdit(message)
-		setEditValues({ email: selectedEdit.email, message: selectedEdit.email })
+	async function handleEdit(el) {
+		alert(el)
+		SetSelectedEdit(el)
+		setEditValues({ email: selectedEdit.email, message: selectedEdit.message })
 	}
 
 	useEffect(() => {
@@ -180,24 +184,7 @@ export default function App() {
 			</div>
 
 
-			<h1 className="text-center">
-				list of Messages</h1>
-
-			<ul className="list-group"> {
-				message.length === 0 && "No messages found "
-			}
-				{
-					message.map((el, i) => (
-						<>
-							<li className="text-center mx-auto list-group-item w-50"
-								key={i}>
-								{
-									el.email
-								} | {el.message} <button className="btn btn-primary" onClick={() => handleEdit(el)}> Edit </button> </li>
-						</>
-					))
-				} </ul>
-
+			<MessageList message={message} saveEditChanges={saveEditChanges} editValues={editValues} deleteMessage={deleteMessage}  handleEdit={handleEdit}/>
 		</>
 	)
 }
