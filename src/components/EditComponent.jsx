@@ -1,4 +1,4 @@
-export default function EditComponent({saveEditChanges,editValues}) {
+export default function EditComponent({ saveEditChanges, editValues, setVal }) {
     return (
         <div className="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div className="modal-dialog">
@@ -16,9 +16,16 @@ export default function EditComponent({saveEditChanges,editValues}) {
                                     <label className="form-label">Email
                                     </label>
 
-                                    <input type="email" name="email" className="form-control " placeholder="name@example.com"
+                                    <input type="email" name="email" className="form-control" placeholder="name@example.com"
                                         value={
                                             editValues.email
+                                        }
+
+                                        onChange={
+                                            (event) => setVal({
+                                                ...editValues,
+                                                email: event.target.value
+                                            })
                                         }
                                     />
 
@@ -27,7 +34,15 @@ export default function EditComponent({saveEditChanges,editValues}) {
                                     <textarea className="form-control mx-auto w-75" rows="3"
                                         value={
                                             editValues.message
-                                        }></textarea>
+                                        }
+
+                                        onChange={
+                                            (event) => setVal({
+                                                ...editValues,
+                                                message: event.target.value
+                                            })
+                                        }
+                                    ></textarea>
                                 </div>
                                 <button type="submit" className="btn btn-primary mb-2">
                                     Edit

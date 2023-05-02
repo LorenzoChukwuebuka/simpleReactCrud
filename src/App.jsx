@@ -10,8 +10,7 @@ export default function App() {
 	const [errorMessage, setErrorMessage] = useState('')
 	const [successMessage, setSuccessMessage] = useState('')
 	const [formError, setFormError] = useState(false)
-	const [editValues, setEditValues] = useState({ email: "", message: "" })
-	const [selectedEdit, SetSelectedEdit] = useState(null)
+
 
 	async function handleSubmit(event) {
 		try {
@@ -55,33 +54,10 @@ export default function App() {
 	}
 
 
-	async function saveEditChanges() {
-	try {
-			const response = await axios.put(
-				`http://localhost:3000/messages/${selectedEdit.id}`,
-				editValues
-			);
-
-			if (response.data.code === 1) {
-				setSuccess(response.data.message);
-				SetSelectedEdit(null);
-				setEditValues({ email: "", message: "" });
-			} else if (response.data.code === 3) {
-				setError(response.data.message);
-			}
-		} catch (error) {
-			console.error(error);
-			setError(error.message);
-		}
-	}
-
-
 	async function deleteMessage(id) {
 		try {
 			if (confirm("Do you want to delete this ?")) {
-				const response = await axios.delete(
-					`http://localhost:3000/messages/${id}`
-				);
+				const response = await axios.delete(`http://localhost:3000/messages/${id}`);
 
 				if (response.data.code === 1) {
 					setSuccessMessage(response.data.message);
@@ -97,21 +73,12 @@ export default function App() {
 	}
 
 
-
-
 	async function getSingleMessage(id) {
 		try {
 			let response = await axios.get(`http://localhost:3000/messages/${id}`)
 
 			console.log(response.data)
 		} catch (error) { }
-	}
-
-
-	async function handleEdit(el) {
-		alert(el)
-		SetSelectedEdit(el)
-		setEditValues({ email: selectedEdit.email, message: selectedEdit.message })
 	}
 
 	useEffect(() => {
@@ -148,9 +115,11 @@ export default function App() {
 					<div className="mb-3 mx-auto  w-75">
 						<label className="form-label">Email
 						</label>
-						<br /> {/* {formError && formValues.email === '' &&
-							(<small className="text-danger mb-2">Phonenumber is required!</small>)
-						} */}
+						<br /> {
+							formError && formValues.email === '' && (
+								<small className="text-danger mb-2">Phonenumber is required!</small>
+							)
+						}
 						<input type="email" name="email" className="form-control " placeholder="name@example.com"
 							value={
 								formValues.email
@@ -174,7 +143,12 @@ export default function App() {
 									message: event.target.value
 								})
 							}></textarea>
-					</div>
+						{
+							formError && formValues.message == '' && (
+								<small className="text-danger">
+									Message is required</small>
+							)
+						} </div>
 					<button type="submit" className="btn btn-primary mb-2">
 						Submit
 					</button>
@@ -184,7 +158,8 @@ export default function App() {
 			</div>
 
 
-			<MessageList message={message} saveEditChanges={saveEditChanges} editValues={editValues} deleteMessage={deleteMessage}  handleEdit={handleEdit}/>
+			<MessageList message={message}
+				deleteMessage={deleteMessage} setError={setError} setSuccess={setSuccess} setSuccessMessage={setSuccessMessage} setErrorMessage={setErrorMessage} />
 		</>
 	)
 }
